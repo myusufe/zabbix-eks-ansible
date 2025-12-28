@@ -1,0 +1,21 @@
+---
+- name: Render Zabbix server manifest from template
+  ansible.builtin.template:
+    src: zabbix-server-deployment.yaml.j2
+    dest: "/tmp/zabbix-server-deployment.yaml"
+
+- name: Deploy Zabbix server
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig_path }}"
+    context: "{{ kube_context | default(omit) }}"
+    namespace: "{{ zabbix_namespace }}"
+    state: present
+    src: "/tmp/zabbix-server-deployment.yaml"
+
+- name: Deploy Zabbix web frontend
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig_path }}"
+    context: "{{ kube_context | default(omit) }}"
+    namespace: "{{ zabbix_namespace }}"
+    state: present
+    src: "{{ role_path }}/files/zabbix-web-deployment.yaml"
