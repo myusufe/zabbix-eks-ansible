@@ -1,6 +1,0 @@
----
-zabbix_server_image: "zabbix/zabbix-server-mysql:alpine-7.4-latest"
-zabbix_web_image: "zabbix/zabbix-web-nginx-mysql:alpine-7.4-latest"
-
-zabbix_server_replicas: 2
-zabbix_web_replicas: 2

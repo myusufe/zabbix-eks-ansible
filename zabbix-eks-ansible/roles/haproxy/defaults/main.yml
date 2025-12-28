@@ -1,3 +1,0 @@
----
-haproxy_image: "haproxy:2.9"
-zabbix_haproxy_service_type: "LoadBalancer"
