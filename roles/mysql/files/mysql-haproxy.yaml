@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-haproxy-config
+data:
+  haproxy.cfg: |
+    global
+      log stdout  format raw  local0
+      maxconn 1024
+
+    defaults
+      log     global
+      mode    tcp
+      option  tcplog
+      timeout connect 10s
+      timeout client  1m
+      timeout server  1m
+
+    frontend mysql_front
+      bind *:3307
+      default_backend mysql_back
+
+    backend mysql_back
+      balance roundrobin
+      server mysql-1 mysql:3306 check
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-ha
+spec:
+  type: ClusterIP
+  selector:
+    app: mysql-haproxy
+  ports:
+    - name: mysql
+      port: 3307
+      targetPort: 3307
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-haproxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-haproxy
+  template:
+    metadata:
+      labels:
+        app: mysql-haproxy
+    spec:
+      containers:
+        - name: haproxy
+          image: haproxy:2.9
+          ports:
+            - containerPort: 3307
+          volumeMounts:
+            - name: haproxy-config
+              mountPath: /usr/local/etc/haproxy/haproxy.cfg
+              subPath: haproxy.cfg
+      volumes:
+        - name: haproxy-config
+          configMap:
+            name: mysql-haproxy-config

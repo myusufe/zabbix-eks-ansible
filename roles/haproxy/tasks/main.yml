@@ -1,0 +1,8 @@
+---
+- name: Deploy HAProxy for Zabbix (external entrypoint)
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig_path }}"
+    context: "{{ kube_context | default(omit) }}"
+    namespace: "{{ zabbix_namespace }}"
+    state: present
+    src: "{{ role_path }}/files/zabbix-haproxy.yaml"
